@@ -1,6 +1,10 @@
 
 #include <stdint.h>
 
+#ifndef BCWAV_H
+#define BCWAV_H
+
+
 #define CWAV_MAGIC 0x56415743
 
 typedef struct sized_ref {
@@ -19,3 +23,5 @@ typedef struct BCWAV_header {
   sized_ref info_offset;
   sized_ref data_offset;
 } BCWAV_header;
+
+#endif // BCWAV_H

@@ -1,12 +1,15 @@
 
 #include <stdint.h>
 
+#ifndef BCSAR_H
+#define BCSAR_H
+
 // Format specifications found at 3dbrew.org
 
 #define CSAR_MAGIC 0x52415343
 #define STRG_MAGIC 0x47525453
 #define INFO_MAGIC 0x4F464E49
-#define FILE_MAGIC
+#define FILE_MAGIC 0x454C4946
 
 
 typedef struct BCSAR_header
@@ -114,3 +117,5 @@ typedef struct magic0x2206 {
   uint32_t offset0xC;
   uint32_t offset0x10;
 } magic0x2206;
+
+#endif // BCSAR_H
