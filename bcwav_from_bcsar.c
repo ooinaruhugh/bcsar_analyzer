@@ -71,16 +71,24 @@ int main(int argc, char const *argv[])
       void *cwav = malloc(cwav_header->file_size);
       fread(cwav, cwav_header->file_size, 1, bcsar_file);
 
-      char *outfile_name = calloc(20, 1);
-      sprintf(outfile_name, "%08d.bcwav", file_count);
+      // char *outfile_name = calloc(20, 1);
+      // sprintf(outfile_name, "%08d.bcwav", file_count);
 
-      FILE *cwav_out = fopen(outfile_name, "wb");
-      fwrite(cwav, cwav_header->file_size, 1, cwav_out);
-      fclose(cwav_out);
+      // FILE *cwav_out = fopen(outfile_name, "wb");
+      // fwrite(cwav, cwav_header->file_size, 1, cwav_out);
+      // fclose(cwav_out);
 
-      if(++file_count > 10)return 0;
+      free(cwav);
+      free(cwav_header);
+      free(magic);
+      // free(outfile_name);
+
+      // if(++file_count > 10)return 0;
+      ++file_count;
       fread(buffer, 4, 1, bcsar_file);
     } while ((next_char = getc(bcsar_file)) != EOF);
+    fclose(bcsar_file);
+    free(buffer);free(header);
   }
   return 0;
 }
