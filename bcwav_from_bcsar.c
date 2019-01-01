@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
     char *buffer = calloc(5, sizeof(*buffer));
     uint32_t *magic_buffer = buffer;
     fread(buffer, 4, 1, bcsar_file);
-    char next_char;
+    uint32_t next_char;
     unsigned int file_count = 1;
     do
     {
@@ -46,13 +46,12 @@ int main(int argc, char const *argv[])
         buffer[1] = buffer[2];
         buffer[2] = buffer[3];
         buffer[3] = next_char;
-        fread(&next_char, 1,1,bcsar_file);
-        /* if (next_char == EOF)
-        // if ((next_char = getc(bcsar_file)) == EOF)
+        
+        if ((next_char = getc(bcsar_file)) == EOF)
         {
           puts("EOF");
           return EXIT_SUCCESS;
-        } */
+        } 
       }
       fseek(bcsar_file, -5, SEEK_CUR);
       printf("Found BCWAV no.%i at Offset 0x%x\n", file_count, ftell(bcsar_file));
@@ -81,8 +80,7 @@ int main(int argc, char const *argv[])
 
       if(++file_count > 10)return 0;
       fread(buffer, 4, 1, bcsar_file);
-    // } while ((next_char = getc(bcsar_file)) != EOF);
-    } while (1);
+    } while ((next_char = getc(bcsar_file)) != EOF);
   }
   return 0;
 }
