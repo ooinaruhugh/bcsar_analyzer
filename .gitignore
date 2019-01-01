@@ -64,4 +64,5 @@ dkms.conf
 .vscode/*
 
 *.bcsar
+*.bcwav
 *bcsar*.txt

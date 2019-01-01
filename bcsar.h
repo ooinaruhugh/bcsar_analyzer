@@ -8,7 +8,6 @@
 #define INFO_MAGIC 0x4F464E49
 #define FILE_MAGIC
 
-#define CWAV_MAGIC 0x56415743
 
 typedef struct BCSAR_header
 {
