@@ -18,7 +18,7 @@ typedef struct BCSAR_header
   uint16_t bom;
   uint16_t header_size;
   uint32_t version;
-  uint32_t file_size;
+  uint32_t size;
   uint32_t partition_count;
   uint32_t partition_header_size;
   uint32_t strg_loc;
@@ -26,8 +26,8 @@ typedef struct BCSAR_header
   uint32_t offset_0x20;
   uint32_t info_loc;
   uint32_t info_length;
-  uint32_t file_loc;
-  uint32_t file_length; // todo: needs rename
+  uint32_t file_length; // seems to be swapped with file_loc (?)
+  uint32_t file_loc; // 
   uint32_t offfset_0x38;
   uint32_t offfset_0x3C;
 } BCSAR_header;

@@ -11,10 +11,6 @@
 #include "bcsar.h"
 #include "bcwav.h"
 
-#define VERBOSE 0
-#define DEBUG 0
-#define ONLY_WHAT_IF 0
-
 int main(int argc, char const *argv[])
 {
   if (argc <= 1)
@@ -23,9 +19,6 @@ int main(int argc, char const *argv[])
   }
   else
   {
-#if VERBOSE
-    printf("Opening %s\n", argv[1]);
-#endif
     // Open the input file
     FILE *bcsar_file = fopen(argv[1], "rb");
     if (!bcsar_file)
@@ -60,9 +53,6 @@ int main(int argc, char const *argv[])
     unsigned int file_count = 1;
     do
     {
-#if VERBOSE
-      puts("Searching for BCWAV...");
-#endif
       while (*magic_buffer != CWAV_MAGIC)
       {
         buffer[0] = buffer[1];
@@ -76,31 +66,16 @@ int main(int argc, char const *argv[])
 
       fseek(bcsar_file, -5, SEEK_CUR);
       printf("Found BCWAV no.%i at Offset 0x%x\n", file_count, ftell(bcsar_file));
-#if VERBOSE
 
-      puts("Retrieving BCWAV header");
-#endif
       // Now get the header of the recently found bcwav
       BCWAV_header *cwav_header = malloc(sizeof(*cwav_header));
       fread(cwav_header, sizeof(*cwav_header), 1, bcsar_file);
       fseek(bcsar_file, -sizeof(*cwav_header), SEEK_CUR);
 
-#if VERBOSE
-      printf("Now at %x\n", ftell(bcsar_file));
 
-      char *magic = calloc(1, 5);
-      *((uint32_t *)magic) = cwav_header->magic;
-
-      printf("BCWAV of size: %i Magic: %s\n", cwav_header->file_size, magic);
-      free(magic);
-
-      printf("Retrieving BCWAV file of size %i\n", cwav_header->file_size);
-#endif
-
-#if !ONLY_WHAT_IF
       // Read the entire bcwav into memory
-      void *cwav = malloc(cwav_header->file_size);
-      fread(cwav, cwav_header->file_size, 1, bcsar_file);
+      void *cwav = malloc(cwav_header->size);
+      fread(cwav, cwav_header->size, 1, bcsar_file);
 
       // Generate the output file name
       char *outfile_name = calloc(strlen(argv[1]) + 20, 1);
@@ -108,22 +83,13 @@ int main(int argc, char const *argv[])
 
       // Open the output file
       FILE *cwav_out = fopen(outfile_name, "wb");
-      fwrite(cwav, cwav_header->file_size, 1, cwav_out);
+      fwrite(cwav, cwav_header->size, 1, cwav_out);
 
       fclose(cwav_out);
       free(cwav);
       free(outfile_name);
-#else
-      // Simulate a read operation
-      fseek(bcsar_file, cwav_header->file_size, SEEK_CUR);
-#endif
 
       free(cwav_header);
-
-#if DEBUG
-      if (++file_count > 10)
-        return 0;
-#endif
 
       ++file_count;
       fread(buffer, 4, 1, bcsar_file);
