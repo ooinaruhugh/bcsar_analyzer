@@ -11,9 +11,9 @@
 #include "bcsar.h"
 #include "bcwav.h"
 
-#define VERBOSE 1
-#define DEBUG 1
-#define ONLY_WHAT_IF 1
+#define VERBOSE 0
+#define DEBUG 0
+#define ONLY_WHAT_IF 0
 
 int main(int argc, char const *argv[])
 {
@@ -51,7 +51,7 @@ int main(int argc, char const *argv[])
 
     // Preparing a buffer to contain four bytes from our input
     char *buffer;
-    uint32_t *magic_buffer;;
+    uint32_t *magic_buffer;
     uint32_t next_char;
 
     magic_buffer = buffer = calloc(5, sizeof(*buffer));
@@ -75,8 +75,8 @@ int main(int argc, char const *argv[])
       }
 
       fseek(bcsar_file, -5, SEEK_CUR);
-#if VERBOSE
       printf("Found BCWAV no.%i at Offset 0x%x\n", file_count, ftell(bcsar_file));
+#if VERBOSE
 
       puts("Retrieving BCWAV header");
 #endif
