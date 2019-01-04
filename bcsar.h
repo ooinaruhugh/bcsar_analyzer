@@ -108,7 +108,7 @@ typedef struct magic0x2204 {
   uint32_t another_ext_info_offset;
   uint32_t offset0x18;
   uint32_t offset0x1c;
-};
+} magic0x2204;
 
 typedef struct magic0x2206 {
   uint32_t offset0x0;
