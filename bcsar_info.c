@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "bcsar.h"
 
 int main(int argc, char const **argv)
@@ -24,12 +25,12 @@ int main(int argc, char const **argv)
     char *magic = calloc(1,5);
     *((uint32_t *)magic) = header->magic;
 
-    printf("MAGIC: %s\nsize (as reported in header): %lu\nLocation of STRG: 0x%lx\nLocation of INFO: 0x%lx\nLocation of FILE: 0x%lx\n", 
-            magic, 
-            header->size,
-            header->strg_loc,
-            header->info_loc,
-            header->file_length);
+    printf("MAGIC: %s\n", magic);
+    printf("size (as reported in header): 0x%"PRIx32"\n", header->size);
+    printf("Location of STRG: 0x%"PRIx32"\n", header->strg_loc);
+    printf("Location of INFO: 0x%"PRIx32"\n", header->info_loc);
+    printf("Location of FILE: 0x%"PRIx32"\n", header->file_loc);
+
   }
   return 0;
 }

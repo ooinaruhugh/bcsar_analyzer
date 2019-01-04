@@ -1,6 +1,6 @@
 /* 
   Quick and dirty program to extract bcwav sound files from
-  a bcsar sound archive.
+  a bcsar sound archive. 
 
   31.12.18 by ooinaruhugh
  */

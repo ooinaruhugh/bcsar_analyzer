@@ -23,11 +23,14 @@ typedef struct BCSAR_header
   uint32_t partition_header_size;
   uint32_t strg_loc;
   uint32_t strg_length;
-  uint32_t offset_0x20;
+  uint32_t offset_0x20; // Padding, seems to be always 0x210
   uint32_t info_loc;
   uint32_t info_length;
-  uint32_t file_length; // seems to be swapped with file_loc (?)
-  uint32_t file_loc; // 
+  // This one is missing from the wiki, as with 0x2C seems to be padding of some sorts?
+  uint32_t offset_0x2C; // And seems to always be 0x220
+
+  uint32_t file_loc;  
+  uint32_t file_length; 
   uint32_t offfset_0x38;
   uint32_t offfset_0x3C;
 } BCSAR_header;
