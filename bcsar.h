@@ -5,6 +5,7 @@
 #define BCSAR_H
 
 // Format specifications found at 3dbrew.org
+// BIG TODO: Renaming the structs and seperate the whole file reading and checking logic
 
 #define CSAR_MAGIC 0x52415343
 #define STRG_MAGIC 0x47525453
@@ -42,14 +43,16 @@ typedef struct Offset_entry
   uint32_t data_length;
 } Offset_entry;
 
+#define STRG_HEADER_END 0x18
+
 typedef struct STRG_header
 {
   uint32_t magic;
   uint32_t length;
   uint32_t table_type;
-  uint32_t string_table; // maybe, "this + 8 points to the string table (always 0x10)"
+  uint32_t string_table; // value + 8 = Offset from the beginning of the header
   uint32_t lookup_type;
-  uint32_t lookup_table; // again, "this + 8"
+  uint32_t lookup_table; // again, value + 8 = Offset from the beginning of the header
   uint32_t filename_count;
   Offset_entry offset_table[];
 } STRG_header;
@@ -73,12 +76,12 @@ typedef struct Lookup_entry
   char res_type;
 } Lookup_entry;
 
-typedef struct Lookup_table
+typedef struct STRG_Lookup_table
 {
   uint32_t root_index;
   uint32_t count;
   Lookup_entry entries[];
-} Lookup_table;
+} STRG_Lookup_table;
 
 
 typedef struct Info_table

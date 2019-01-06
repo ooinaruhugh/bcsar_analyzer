@@ -18,6 +18,13 @@ STRG_header *read_strg(BCSAR_header *header, FILE *bcsar)
   return strg; 
 }
 
+void *read_partition(FILE *bcsar, uint64_t offset, uint64_t size) {
+  void *partition = calloc(1,size);
+  fseek(bcsar, offset, SEEK_SET);
+  fread(partition, size, 1, bcsar);
+  return partition; 
+}
+
 void print_strg(STRG_header *strg)
 {
 }
@@ -60,24 +67,23 @@ int main(int argc, char const **argv)
     puts("\n== STRG partition info ==");
     STRG_header *strg = read_strg(header, bcsar_file);
     printf("Filename count: %" PRIu32 "\n", strg->filename_count);
-    printf("Lookup table offset: 0x%" PRIx32 "\n", strg->lookup_table);
+    printf("Lookup table offset: 0x%" PRIx32 "\n", strg->lookup_table + header->strg_loc + 0x8);
 
-    char *ptr_to_str = (uintptr_t) strg + (uintptr_t)0x18 + (uintptr_t)strg->offset_table[0].data_offset;
-    char *actual_string = memcpy(calloc(1, strg->offset_table[0].data_length), ptr_to_str, strg->offset_table[0].data_length);
-    printf("Offset: 0x%x Length: 0x%x Value:%s\n", strg->offset_table[0].data_offset, strg->offset_table[0].data_length, actual_string); 
-    printf("(In memory) STRG:%x String: %x Offset: %x\n", strg, ptr_to_str, (uintptr_t)ptr_to_str - (uintptr_t)strg);
+    STRG_Lookup_table *lookup_table = (uintptr_t) strg + strg->lookup_table + 0x8;
+    printf("Index of the root entry: %"PRIu32"\n", lookup_table->root_index);
+    printf("Entry count: %"PRIu32"\n", lookup_table->count);
+
+    puts("\n== INFO partition info ==");
+    Info_table *info = read_partition(bcsar_file, header->info_loc, header->info_length);
+    printf("Length of partition: %x", info->length);
     /* puts("# File list");
 
-    char *filename;
     // char *filelist_name = calloc(strlen(argv[1])+10, 1);
     // sprintf(filelist_name, "%s.list.txt", argv[1]);
     // FILE *filelist = fopen(filelist_name, "a"); 
     for (int i = 0; i < strg->filename_count; i++) {
-      filename = calloc(strg->offset_table[i].data_length + 1, 1);
-      fseek(bcsar_file, header->strg_loc + 0x18 + strg->offset_table[i].data_offset, SEEK_SET);
-      fread(filename, strg->offset_table[i].data_length, 1, bcsar_file);
+      char *filename = (uintptr_t)strg + STRG_HEADER_END + strg->offset_table[i].data_offset;
       fprintf(stdout, "%s\n", filename);
-      free(filename);
     } */
 
     free(magic_buffer);
