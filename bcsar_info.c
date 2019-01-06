@@ -15,18 +15,39 @@ STRG_header *read_strg(BCSAR_header *header, FILE *bcsar)
   STRG_header *strg = calloc(1, header->strg_length);
   fseek(bcsar, header->strg_loc, SEEK_SET);
   fread(strg, header->strg_length, 1, bcsar);
-  return strg; 
+  return strg;
 }
 
-void *read_partition(FILE *bcsar, uint64_t offset, uint64_t size) {
-  void *partition = calloc(1,size);
+void *read_partition(FILE *bcsar, uint64_t offset, uint64_t size)
+{
+  void *partition = calloc(1, size);
   fseek(bcsar, offset, SEEK_SET);
   fread(partition, size, 1, bcsar);
-  return partition; 
+  return partition;
 }
 
 void print_strg(STRG_header *strg)
 {
+}
+
+void print_string_table(STRG_header *strg, FILE *output, char delimiter)
+{
+  for (int i = 0; i < strg->filename_count; i++)
+  {
+    char *filename = (uintptr_t)strg + STRG_HEADER_END + strg->offset_table[i].data_offset;
+    fprintf(output, "%8i%c%s\n", i, delimiter, filename);
+    fflush(output);
+  }
+}
+
+void print_lookup_table(STRG_Lookup_table *strg_lookup, FILE *output, char delimiter)
+{
+  for (int i = 0; i < strg_lookup->count; i++)
+  {
+    Lookup_entry *entry = strg_lookup->entries + i;
+    fprintf(output, "%8i%c%x%c%x%c%x%c%x%c%x%c%x%c%x\n", i, delimiter, entry->has_data, delimiter, entry->bit_test, delimiter, entry->fail_leaf_index, delimiter, entry->success_leaf_index, delimiter, entry->lookup_index, delimiter, entry->res_id.id, delimiter, entry->res_type);
+    fflush(output);
+  }
 }
 
 int main(int argc, char const **argv)
@@ -69,22 +90,31 @@ int main(int argc, char const **argv)
     printf("Filename count: %" PRIu32 "\n", strg->filename_count);
     printf("Lookup table offset: 0x%" PRIx32 "\n", strg->lookup_table + header->strg_loc + 0x8);
 
-    STRG_Lookup_table *lookup_table = (uintptr_t) strg + strg->lookup_table + 0x8;
-    printf("Index of the root entry: %"PRIu32"\n", lookup_table->root_index);
-    printf("Entry count: %"PRIu32"\n", lookup_table->count);
+    STRG_Lookup_table *lookup_table = (uintptr_t)strg + strg->lookup_table + 0x8;
+    printf("Index of the root entry: %" PRIu32 "\n", lookup_table->root_index);
+    printf("Entry count: %" PRIu32 "\n", lookup_table->count);
 
     puts("\n== INFO partition info ==");
     Info_table *info = read_partition(bcsar_file, header->info_loc, header->info_length);
-    printf("Length of partition: %x", info->length);
-    /* puts("# File list");
+    printf("Length of partition: %x\n", info->length);
+    // puts("# File list");
 
-    // char *filelist_name = calloc(strlen(argv[1])+10, 1);
-    // sprintf(filelist_name, "%s.list.txt", argv[1]);
-    // FILE *filelist = fopen(filelist_name, "a"); 
-    for (int i = 0; i < strg->filename_count; i++) {
-      char *filename = (uintptr_t)strg + STRG_HEADER_END + strg->offset_table[i].data_offset;
-      fprintf(stdout, "%s\n", filename);
-    } */
+    /* char *filelist_name = calloc(strlen(argv[1])+10, 1);
+    sprintf(filelist_name, "%s.list.csv", argv[1]);
+    FILE *filelist = fopen(filelist_name, "a"); 
+    fprintf(filelist, "sep=,\nIndex,Name\n");
+    print_string_table(strg, filelist, ',');
+    fclose(filelist);
+    free(filelist_name); */
+    // print_string_table(strg, stdout, ' ');
+
+    char *lookup = calloc(strlen(argv[1])+12, 1);
+    sprintf(lookup, "%s.lookup.csv", argv[1]);
+    FILE *lookup_csv = fopen(lookup, "a"); 
+    fprintf(lookup_csv, "sep=,\nhas_data,bittest_condition,fail_condition_leaf,success_condition_leaf,index,resource_id,resource_type\n");
+    print_lookup_table(lookup_table, lookup_csv, ',');
+    fclose(lookup_csv);
+    free(lookup);
 
     free(magic_buffer);
     free(strg);

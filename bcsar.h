@@ -67,12 +67,12 @@ typedef struct Lookup_entry
   uint32_t success_leaf_index;
   uint32_t lookup_index;
 
-  /* union resid
+  union
   {
      char bytes[3];
      uint32_t id:12;
-  }; */
-  char res_id[3];
+  } res_id;
+  // char res_id[3];
   char res_type;
 } Lookup_entry;
 
