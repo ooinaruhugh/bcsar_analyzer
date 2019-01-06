@@ -63,6 +63,5 @@ dkms.conf
 # Visual Studio Code
 .vscode/*
 
-*.bcsar
-*.bcwav
-*bcsar*.txt
+# There's a folder with example files I cannot share (and all that stuff lives in research)
+research/*
