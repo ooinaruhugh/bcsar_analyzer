@@ -6,12 +6,16 @@
 
 STRG_header *read_strg(BCSAR_header *header, FILE *bcsar)
 {
-  STRG_header *strg = calloc(1, sizeof(*strg));
+  /* STRG_header *strg = calloc(1, sizeof(*strg));
   fseek(bcsar, header->strg_loc, SEEK_SET);
   fread(strg, 0x1C, 1, bcsar);
   strg->offset_table = malloc(strg->length - 0x1C);
   fread(strg->offset_table, strg->length - 0x1C, 1, bcsar);
-  return strg;
+  return strg; */
+  STRG_header *strg = calloc(1, header->strg_length);
+  fseek(bcsar, header->strg_loc, SEEK_SET);
+  fread(strg, header->strg_length, 1, bcsar);
+  return strg; 
 }
 
 void print_strg(STRG_header *strg)
@@ -56,30 +60,25 @@ int main(int argc, char const **argv)
     puts("\n== STRG partition info ==");
     STRG_header *strg = read_strg(header, bcsar_file);
     printf("Filename count: %" PRIu32 "\n", strg->filename_count);
+    printf("Lookup table offset: 0x%" PRIx32 "\n", strg->lookup_table);
 
-    printf("Offset: 0x%x Length: 0x%x\n", strg->offset_table[0].data_offset, strg->offset_table[0].data_length);
-    printf("Offset: 0x%x Length: 0x%x\n", strg->offset_table[1].data_offset, strg->offset_table[1].data_length);
-    printf("Offset: 0x%x Length: 0x%x\n", strg->offset_table[strg->filename_count-1].data_offset, strg->offset_table[strg->filename_count-1].data_length);
-
-    puts("# File list");
+    char *ptr_to_str = (uintptr_t) strg + (uintptr_t)0x18 + (uintptr_t)strg->offset_table[0].data_offset;
+    char *actual_string = memcpy(calloc(1, strg->offset_table[0].data_length), ptr_to_str, strg->offset_table[0].data_length);
+    printf("Offset: 0x%x Length: 0x%x Value:%s\n", strg->offset_table[0].data_offset, strg->offset_table[0].data_length, actual_string); 
+    printf("(In memory) STRG:%x String: %x Offset: %x\n", strg, ptr_to_str, (uintptr_t)ptr_to_str - (uintptr_t)strg);
+    /* puts("# File list");
 
     char *filename;
-    /* char *filelist_name = calloc(strlen(argv[1])+10, 1);
-    sprintf(filelist_name, "%s.list.txt", argv[1]);
-    FILE *filelist = fopen(filelist_name, "a"); */
+    // char *filelist_name = calloc(strlen(argv[1])+10, 1);
+    // sprintf(filelist_name, "%s.list.txt", argv[1]);
+    // FILE *filelist = fopen(filelist_name, "a"); 
     for (int i = 0; i < strg->filename_count; i++) {
       filename = calloc(strg->offset_table[i].data_length + 1, 1);
       fseek(bcsar_file, header->strg_loc + 0x18 + strg->offset_table[i].data_offset, SEEK_SET);
       fread(filename, strg->offset_table[i].data_length, 1, bcsar_file);
       fprintf(stdout, "%s\n", filename);
       free(filename);
-    }
-    /* printf("0x%x\n", (uintptr_t)&strg->offset_table - (uintptr_t)strg);
-    char *test = calloc(1, 0xD);
-    memcpy(test, strg->offset_table, 0xC); */
-    // char *test = calloc(1, strg->offset_table[0].data_length);
-
-    // puts(test);
+    } */
 
     free(magic_buffer);
     free(strg);

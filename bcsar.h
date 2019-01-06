@@ -35,7 +35,12 @@ typedef struct BCSAR_header
   uint32_t offfset_0x3C;
 } BCSAR_header;
 
-typedef struct Offset_entry Offset_entry;
+typedef struct Offset_entry
+{
+  uint32_t node_type;
+  uint32_t data_offset; // from the end of the string header
+  uint32_t data_length;
+} Offset_entry;
 
 typedef struct STRG_header
 {
@@ -46,26 +51,12 @@ typedef struct STRG_header
   uint32_t lookup_type;
   uint32_t lookup_table; // again, "this + 8"
   uint32_t filename_count;
-  Offset_entry *offset_table;
+  Offset_entry offset_table[];
 } STRG_header;
 
-struct Offset_entry
-{
-  uint32_t node_type;
-  uint32_t data_offset; // from the end of the string header
-  uint32_t data_length;
-};
 
-typedef struct Lookup_entry Lookup_entry;
 
-typedef struct Lookup_table
-{
-  uint32_t root_index;
-  uint32_t count;
-  Lookup_entry *entries;
-} Lookup_table;
-
-struct Lookup_entry
+typedef struct Lookup_entry
 {
   uint16_t has_data;
   uint16_t bit_test;
@@ -80,7 +71,15 @@ struct Lookup_entry
   }; */
   char res_id[3];
   char res_type;
-};
+} Lookup_entry;
+
+typedef struct Lookup_table
+{
+  uint32_t root_index;
+  uint32_t count;
+  Lookup_entry entries[];
+} Lookup_table;
+
 
 typedef struct Info_table
 {
